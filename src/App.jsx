@@ -1,3 +1,11 @@
+// Simple storage shim using localStorage
+if (!window.storage) {
+  window.storage = {
+    get: async (key) => ({ value: localStorage.getItem(key) }),
+    set: async (key, value) => { localStorage.setItem(key, value); }
+  };
+}
+
 import React, { useState, useEffect } from 'react';
 import { Plus, Trash2, Save, Download, Upload, User, Award, TrendingUp, FileUp, Users, Cloud, HardDrive, Info } from 'lucide-react';
 
@@ -539,7 +547,7 @@ const QuranRecitationTracker = () => {
                       <div className="w-full bg-gray-200 rounded-full h-2">
                         <div
                           className="bg-blue-600 h-2 rounded-full"
-                          style={{ width: `${student.averageScore || 0}%` }}
+                          style={{ width: `${Math.max(0, Math.min(100, student.averageScore || 0))}%` }}np
                         />
                       </div>
                     </div>
@@ -591,7 +599,8 @@ const QuranRecitationTracker = () => {
                 onChange={(e) => setNewStudentName(e.target.value)}
                 placeholder="Teacher Name (e.g., Ustadh Ahmed)"
                 className="w-full p-3 border rounded mb-4"
-                onKeyPress={(e) => e.key === 'Enter' && saveTeacherName(newStudentName)}
+                onKeyDown={(e) => e.key === 'Enter' && saveTeacherName(newStudentName)}
+
               />
               <button
                 onClick={() => saveTeacherName(newStudentName)}
@@ -666,7 +675,7 @@ const QuranRecitationTracker = () => {
                 onChange={(e) => setNewStudentName(e.target.value)}
                 placeholder="Student Name"
                 className="w-full p-3 border rounded mb-4"
-                onKeyPress={(e) => e.key === 'Enter' && addStudent()}
+                onKeyDown={(e) => e.key === 'Enter' && addStudent()}
               />
               <div className="flex gap-3">
                 <button
